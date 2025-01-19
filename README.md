@@ -59,10 +59,11 @@ generated_story = generate_story(prompt)
 # Print the generated story
 print("Generated Story:")
 print(generated_story)
-
+```
 Character Bio Generation
  Create detailed biographies from character descriptions:
 def generate_character_bio(character_description):
+    ```python
     payload = {
         "model": "text-davinci-003",
         "prompt": f"Generate a biography for this character:\n{character_description}",
@@ -70,9 +71,10 @@ def generate_character_bio(character_description):
     }
     response = requests.post("https://api.worqhat.com/v1/completions", json=payload, headers=headers)
     return response.json()["choices"][0]["text"]
-
+```
 Image Generation
  Produce visuals from scene or character descriptions using Stable Diffusion:
+```python
 from diffusers import StableDiffusionPipeline
 from PIL import Image  # To display the image inline in Colab
 
@@ -87,7 +89,7 @@ image = pipe(description).images[0]
 # Display the image inline
 image.show()  # This will not work in Colab, so replace it with the code below
 display(image)  # Use this to display the image inline in Colab
-
+```
 Interactive Frontend
 Streamlit App
 ```python
@@ -125,7 +127,7 @@ if st.button("Generate Visual"):
         st.image(image, caption="Generated Visual")
     else:
         st.error("Please enter a description!")
-
+```
 Running Locally
  Run the application:
 streamlit run app.py
