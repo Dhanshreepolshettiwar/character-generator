@@ -63,7 +63,7 @@ print(generated_story)
 Character Bio Generation
  Create detailed biographies from character descriptions:
 def generate_character_bio(character_description):
-    ```python
+```python
     payload = {
         "model": "text-davinci-003",
         "prompt": f"Generate a biography for this character:\n{character_description}",
