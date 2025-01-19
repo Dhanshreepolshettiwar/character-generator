@@ -30,42 +30,34 @@ Get your WorqHat API key and configure it:
 Code Implementation
 Script Analysis
  Summarize scripts into key scenes:
-import requests
-# Define your Worqhat API key
-api_key = "sk-e95304071474418ca01507367e72fc60"
-# Define the endpoint URL
-url = "https://api.worqhat.com/v1/completions"
-# Define the headers with the API key
-headers = {
-    "Authorization": f"Bearer {api_key}",
-    "Content-Type": "application/json"
-}
-# Define the story generation function
-def generate_story(prompt):
-    payload = {
-        "model": "text-davinci-003",  # Use your desired model from Worqhat
-        "prompt": prompt,
-        "max_tokens": 250,  # Adjust the length of the story
-        "temperature": 0.7,  # Controls randomness
-    }
-    # Send the POST request to the Worqhat API
-    response = requests.post(url, json=payload, headers=headers)
+from transformers import GPT2LMHeadModel, GPT2Tokenizer
 
-    if response.status_code == 200:
-        result = response.json()
-        return result['choices'][0]['text'].strip()
-    else:
-        return f"Error: {response.status_code}, {response.text}"
+# Load pre-trained model and tokenizer
+model_name = "gpt2"  # You can use other models like 'gpt2-medium', 'gpt2-large', etc.
+model = GPT2LMHeadModel.from_pretrained(model_name)
+tokenizer = GPT2Tokenizer.from_pretrained(model_name)
 
-# Example usage
-description = "futuristic city from future"
-story_prompt = f"Write a short story about a {description}."
-story = generate_story(story_prompt)
+# Function to generate a story
+def generate_story(prompt, max_length=200):
+    # Encode the prompt text to tensor
+    inputs = tokenizer.encode(prompt, return_tensors="pt")
+
+    # Generate the story using the model
+    outputs = model.generate(inputs, max_length=max_length, num_return_sequences=1, no_repeat_ngram_size=2, top_p=0.9, temperature=0.7)
+
+    # Decode and return the generated text
+    story = tokenizer.decode(outputs[0], skip_special_tokens=True)
+    return story
+
+# Example prompt for generating a story
+prompt = "Once upon a time in a futuristic city, there lived a robot named Zeta who dreamed of exploring the stars."
+
+# Generate a story
+generated_story = generate_story(prompt)
 
 # Print the generated story
 print("Generated Story:")
-print(story)
-
+print(generated_story)
 
 Character Bio Generation
  Create detailed biographies from character descriptions:
