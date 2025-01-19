@@ -1,0 +1,84 @@
+import torch
+print(torch.cuda.is_available())
+!pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+!pip install --upgrade torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118
+
+from diffusers import StableDiffusionPipeline
+from PIL import Image  # To display the image inline in Colab
+
+# Load the Stable Diffusion model
+pipe = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5")
+pipe = pipe.to("cuda")  # Use "cpu" if GPU is unavailable
+
+# Generate an image
+description = "futuristic city from future"
+image = pipe(description).images[0]
+
+# Display the image inline
+image.show()  # This will not work in Colab, so replace it with the code below
+display(image)  # Use this to display the image inline in Colab
+
+!pip install pillow matplotlib opencv-python moviepy
+import torch
+from diffusers import StableDiffusionPipeline
+from PIL import Image
+import numpy as np
+import moviepy.editor as mpy
+
+# Check if CUDA is available
+device = "cuda" if torch.cuda.is_available() else "cpu"
+
+# Load the Stable Diffusion model
+pipe = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5")
+pipe = pipe.to(device)
+
+# Function to create multiple frames for the animation
+def generate_frames(prompt, num_frames=30, transformation="zoom"):
+    frames = []
+    for i in range(num_frames):
+        print(f"Generating frame {i + 1}/{num_frames}...")
+        # Modify the prompt or seed to create variation between frames
+        variation_prompt = f"{prompt}, frame {i}"
+
+        # Generate the image
+        image = pipe(variation_prompt).images[0]
+
+        # Apply a transformation if specified
+        if transformation == "zoom":
+            image = zoom_image(image, zoom_factor=1 + i * 0.01)  # Slight zoom per frame
+
+        frames.append(image)
+    return frames
+
+# Function to zoom into an image (for animation effects)
+def zoom_image(image, zoom_factor=1.0):
+    w, h = image.size
+    x = int(w / zoom_factor)
+    y = int(h / zoom_factor)
+    image = image.crop(((w - x) // 2, (h - y) // 2, (w + x) // 2, (h + y) // 2))
+    return image.resize((w, h), Image.LANCZOS)
+
+# Generate animation frames
+prompt = "Rabbit eating carrot and chewing it"
+frames = generate_frames(prompt, num_frames=30, transformation="zoom")
+
+# Save the frames as a GIF or video
+def save_as_gif(frames, filename="animation.gif"):
+    frames[0].save(
+        filename,
+        save_all=True,
+        append_images=frames[1:],
+        duration=100,  # Duration of each frame in milliseconds
+        loop=0
+    )
+    print(f"GIF saved as {filename}")
+
+def save_as_video(frames, filename="animation.mp4"):
+    video_frames = [np.array(frame) for frame in frames]
+    clip = mpy.ImageSequenceClip(video_frames, fps=30)  # 30 FPS
+    clip.write_videofile(filename, codec="libx264")
+    print(f"Video saved as {filename}")
+
+# Save as GIF or video
+save_as_gif(frames, "city_animation.gif")
+save_as_video(frames, "city_animation.mp4")
