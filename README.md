@@ -63,7 +63,6 @@ print(generated_story)
 Character Bio Generation
  Create detailed biographies from character descriptions:
 def generate_character_bio(character_description):
-```python
     payload = {
         "model": "text-davinci-003",
         "prompt": f"Generate a biography for this character:\n{character_description}",
@@ -74,7 +73,6 @@ def generate_character_bio(character_description):
 
 Image Generation
  Produce visuals from scene or character descriptions using Stable Diffusion:
-```python
 from diffusers import StableDiffusionPipeline
 from PIL import Image  # To display the image inline in Colab
 
